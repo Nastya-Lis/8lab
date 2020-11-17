@@ -21,6 +21,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.a8lab.R;
+import com.example.a8lab.databaseManager.RecipeSQLiteDataBase;
 import com.example.a8lab.units.Category;
 import com.example.a8lab.units.Recipe;
 
@@ -35,9 +36,9 @@ public class UpdateRecipeActivity extends AppCompatActivity {
 
     Recipe currentRecipe = new Recipe();
     Recipe fisrtDataRecipe = new Recipe();
-    Recipe lastDataRecipe = new Recipe();
 
-    List<Recipe> recipeList = new ArrayList<>();
+
+
     final String nameUser = "User_ID";
     String userId;
    // DatabaseReference db;
@@ -52,6 +53,9 @@ public class UpdateRecipeActivity extends AppCompatActivity {
     CheckBox checkBox;
     TimePicker timePicker;
     Uri photoUri;
+    RecipeSQLiteDataBase recipeSQLiteDataBase;
+
+    Integer idRecipe;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +109,7 @@ public class UpdateRecipeActivity extends AppCompatActivity {
     }
 
     private void createRecipe(){
+        currentRecipe.setId(idRecipe);
         currentRecipe.setName(name.getText().toString());
         currentRecipe.setIngredient(ingredient.getText().toString());
         currentRecipe.setCookingRecipe(cookingRecipe.getText().toString());
@@ -152,10 +157,13 @@ public class UpdateRecipeActivity extends AppCompatActivity {
     private void checkData(){
         Bundle bundle = getIntent().getExtras();
         if(bundle != null){
-            userId = bundle.get(nameUser).toString();
+
             Recipe gettingRecipe =(Recipe) bundle.getSerializable(Recipe.class.getSimpleName());
 
+
             fisrtDataRecipe = gettingRecipe;
+
+            idRecipe = gettingRecipe.getId();
 
             name.setText(gettingRecipe.getName());
             ingredient.setText(gettingRecipe.getIngredient());
@@ -220,9 +228,11 @@ public class UpdateRecipeActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         createRecipe();
+                        recipeSQLiteDataBase = RecipeSQLiteDataBase.getInstance(UpdateRecipeActivity.this);
+                        recipeSQLiteDataBase.updateRecipeInDb(currentRecipe);
                      /*   db = FirebaseDatabase.getInstance().getReference(userId);*/
-                        Bundle bundle = getIntent().getExtras();
-                        String key = bundle.get("currentKey").toString();
+                     /*   Bundle bundle = getIntent().getExtras();
+                        String key = bundle.get("currentKey").toString();*/
 
                     /*    db.child(key).setValue(currentRecipe);*/
 

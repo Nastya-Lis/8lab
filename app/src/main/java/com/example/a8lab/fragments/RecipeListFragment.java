@@ -126,6 +126,11 @@ public class RecipeListFragment extends Fragment {
         });*/
         try {
             recipesFromDb = recipeSQLiteDataBase.takeAllRecipesFromDb();
+            //recipeAdapter.notifyDataSetChanged();
+            recipeAdapter = new RecipeAdapter(recipesFromDb);
+            recyclerView.setAdapter(recipeAdapter);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
         } catch (SQLDBException e) {
             e.printStackTrace();
         }
@@ -136,6 +141,9 @@ public class RecipeListFragment extends Fragment {
         super.onStart();
     }
 
+    public RecipeSQLiteDataBase returnSQLiteDb(){
+        return recipeSQLiteDataBase;
+    }
 
     public void delDB(){
         //recipeSQLiteDataBaseSingleton.sqLiteDatabase

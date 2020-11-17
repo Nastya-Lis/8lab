@@ -39,10 +39,5 @@
         app:showAsAction="ifRoom"
         android:title="@string/addIcon">
     </item>
-    <item
-        android:id="@+id/logOutIcon"
-        android:icon="@drawable/exit"
-        app:showAsAction="ifRoom"
-        android:title="Exit">
-    </item>
+
 </menu>

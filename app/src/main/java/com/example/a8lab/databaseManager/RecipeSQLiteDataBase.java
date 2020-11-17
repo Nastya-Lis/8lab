@@ -20,6 +20,7 @@ public class RecipeSQLiteDataBase {
     private SQLiteDatabase sqLiteDatabase;
     Context context;
 
+
     private RecipeSQLiteDataBase(){}
 
     public static RecipeSQLiteDataBase getInstance(Context context){
@@ -65,18 +66,18 @@ public class RecipeSQLiteDataBase {
         contentValues.put(RecipesDataBaseContract.DbContract.COLUMN_TIME,recipe.getTimeCooking());
         contentValues.put(RecipesDataBaseContract.DbContract.COLUMN_CATEGORY,recipe.getCategory().toString());
         contentValues.put(RecipesDataBaseContract.DbContract.COLUMN_PHOTO,recipe.getPhoto());
-        contentValues.put(RecipesDataBaseContract.DbContract.COLUMN_FAVORITE,recipe.isFavourite());
+        contentValues.put(RecipesDataBaseContract.DbContract.COLUMN_FAVORITE,String.valueOf(recipe.isFavourite()));
 
-        sqLiteDatabase.update(RecipesDataBaseContract.DbContract.TABLE_NAME,contentValues,RecipesDataBaseContract.DbContract.COLUMN_ID + "= ? AND"
-                + RecipesDataBaseContract.DbContract.COLUMN_NAME + " = ?",
-                new String[] {recipe.getId().toString(), recipe.getName()});
+        sqLiteDatabase.update(RecipesDataBaseContract.DbContract.TABLE_NAME,contentValues,
+                RecipesDataBaseContract.DbContract.COLUMN_ID + " =? ",
+                new String[] {recipe.getId().toString()});
 
     }
 
     public void deleteRecipeFromDb(Recipe recipe) throws SQLDBException{
         if(sqLiteDatabase.delete(RecipesDataBaseContract.DbContract.TABLE_NAME,
-                RecipesDataBaseContract.DbContract.COLUMN_ID + "= ? AND" +
-                         RecipesDataBaseContract.DbContract.COLUMN_NAME + "= ?",
+                RecipesDataBaseContract.DbContract.COLUMN_ID + " =? AND " +
+                         RecipesDataBaseContract.DbContract.COLUMN_NAME + " =?",
                 new String[] {recipe.getId().toString(),recipe.getName()}) == -1)
             throw new SQLDBException("not deleted");
 

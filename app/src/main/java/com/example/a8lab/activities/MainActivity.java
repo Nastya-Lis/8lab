@@ -84,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        listFragment.createListFromDb();
         creationOfPopupMenu(orientation);
     }
 
@@ -135,14 +136,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void editRecipe(Recipe recipe){
         Intent intent = new Intent(this,UpdateRecipeActivity.class);
-        String currentKey = "";
+       /* String currentKey = "";
         for (String key: listFragment.forListManager.keySet()) {
             if( recipe == listFragment.forListManager.get(key))
             currentKey = key;
-        }
+        }*/
         intent.putExtra(Recipe.class.getSimpleName(),recipe);
      /*   intent.putExtra(nameUser,userId);*/
-        intent.putExtra("currentKey",currentKey);
+       // intent.putExtra("currentKey",currentKey);
         startActivity(intent);
     }
 
@@ -154,9 +155,11 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         try {
-                            ListExistingRecipesManager listExistingRecipesManager =
+                            /*ListExistingRecipesManager listExistingRecipesManager =
                                     new ListExistingRecipesManager(recipesFromDb,listFragment.forListManager);
-                            listExistingRecipesManager.removeElementV2(recipe);
+                            listExistingRecipesManager.removeElementV2(recipe);*/
+                            listFragment.returnSQLiteDb().deleteRecipeFromDb(recipe);
+                            onResume();
                         }
                         catch (Exception e){
 
@@ -240,21 +243,6 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.up:
                 listFragment.recyclerView.scrollToPosition(0);
-                break;
-            case R.id.logOutIcon:
-                AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-                alertDialog.setTitle("Warning!").setMessage("Do you really want to exit from account")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                             /*  FirebaseAuth.getInstance().signOut();*/
-                            /*   Intent intent1 = new
-                                       Intent(MainActivity.this, LoginActivity.class);
-                                startActivity(intent1);*/
-                                finish();
-                            }
-                        }).setNegativeButton("No", (dialogInterface, i) -> { });
-                alertDialog.create().show();
                 break;
         }
         return super.onOptionsItemSelected(item);
