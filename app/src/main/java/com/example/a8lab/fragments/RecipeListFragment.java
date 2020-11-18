@@ -1,9 +1,25 @@
 package com.example.a8lab.fragments;
 
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.IntentSender;
+import android.content.ServiceConnection;
+import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.database.DatabaseErrorHandler;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,6 +28,10 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.os.UserHandle;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +50,12 @@ import com.example.a8lab.units.ListExistingRecipesManager;
 import com.example.a8lab.units.Recipe;
 
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -42,6 +68,7 @@ import java.util.Map;
 public class RecipeListFragment extends Fragment {
 
     Context context;
+    String stringInstanceContext;
 
     View ListFragmentView;
     public RecyclerView recyclerView;
@@ -81,7 +108,7 @@ public class RecipeListFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-       /* outState.putString(nameUser,userId);*/
+        //outState.putString();
         super.onSaveInstanceState(outState);
     }
 
@@ -89,13 +116,14 @@ public class RecipeListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-      /*  databaseReference = FirebaseDatabase.getInstance().getReference(userId);*/
             try
             {
-                recipeSQLiteDataBase = RecipeSQLiteDataBase.getInstance(context);
+                /*recipeSQLiteDataBaseSingleton.sqLiteDatabase = context.openOrCreateDatabase(RecipesDataBaseContract.DATABASE_NAME,
+                        Context.MODE_PRIVATE,null );*/
+                recipeSQLiteDataBase = RecipeSQLiteDataBase.getInstance(getActivity());
                 recipesFromDb = new ArrayList<>();
                 recipesFromDb = recipeSQLiteDataBase.takeAllRecipesFromDb();
-                //new ArrayList<>();
+
                // createListFromDb();
             } catch (SQLDBException e) {
                 e.printStackTrace();
@@ -103,27 +131,14 @@ public class RecipeListFragment extends Fragment {
 
     }
 
+    @Override
+    public void onPause() {
+        //recipeSQLiteDataBase.openOrCreate(context);
+        super.onPause();
+    }
 
     public void createListFromDb(){
- /*      databaseReference.addValueEventListener(new ValueEventListener() {
 
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(recipesFromDb.size() > 0 ) recipesFromDb.clear();
-                for (DataSnapshot snap: snapshot.getChildren()) {
-                    Recipe recipe  = snap.getValue(Recipe.class);
-                    String str = snap.getKey();
-                    forListManager.put(str,recipe);
-                    recipesFromDb.add(recipe);
-                }
-                recipeAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });*/
         try {
             recipesFromDb = recipeSQLiteDataBase.takeAllRecipesFromDb();
             //recipeAdapter.notifyDataSetChanged();
@@ -137,7 +152,8 @@ public class RecipeListFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
+    public void onStart()
+    {
         super.onStart();
     }
 
@@ -148,6 +164,10 @@ public class RecipeListFragment extends Fragment {
     public void delDB(){
         //recipeSQLiteDataBaseSingleton.sqLiteDatabase
         context.deleteDatabase(RecipesDataBaseContract.DATABASE_NAME);
+    }
+
+    public void closeDB(){
+        recipeSQLiteDataBase.closeDataBase();
     }
 
     @Override

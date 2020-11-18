@@ -28,8 +28,12 @@
                 android:id="@+id/sorting_by_category"
                 android:title="@string/by_category"/>
             <item
+            android:id="@+id/sorting_by_checkFavourite"
+            android:title="sort by favourite"></item>
+            <item
                 android:id="@+id/sorting_by_default"
                 android:title="sort by default"></item>
+
         </menu>
     </item>
 

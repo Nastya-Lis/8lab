@@ -28,17 +28,6 @@ public class Recipe implements Serializable {
     }
 
 
-    public Recipe(Integer id){
-        this.id = id;
-        this.category = Category.OTHERS;
-        this.name = "Default";
-        this.ingredient="Default";
-        this.photo = null;
-        this.timeCooking = null;
-        this.favourite = false;
-    }
-
-
     public Integer getId() {
         return id;
     }

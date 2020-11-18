@@ -34,8 +34,15 @@ public class RecipeSQLiteDataBase {
         return recipeSQLiteDataBaseSingleton;
     }
 
+    public void openOrCreate(Context context1){
+        recipeSQLiteDataBaseSingleton.sqLiteDatabase = context1.openOrCreateDatabase(RecipesDataBaseContract.DATABASE_NAME,
+                Context.MODE_PRIVATE,null);
+    }
 
+    public void closeDataBase(){
 
+        recipeSQLiteDataBaseSingleton.sqLiteDatabase.close();
+    }
 
     public void addRecipeToDb(Recipe recipe) throws SQLDBException{
 
@@ -124,14 +131,10 @@ public class RecipeSQLiteDataBase {
         recipe.setTimeCooking(cursor.getString(indexTime));
         recipe.setCategory(Category.convertStringIntoCategoryType(cursor.getString(indexCategory)));
         recipe.setPhoto(cursor.getString(indexPhoto));
-        recipe.setFavourite(Boolean.getBoolean(cursor.getString(indexFavorite)));
-
+        recipe.setFavourite(Boolean.valueOf(cursor.getString(indexFavorite)));
         return recipe;
     }
 
-    public void closeDataBase(){
 
-        recipeSQLiteDataBaseSingleton.sqLiteDatabase.close();
-    }
 
 }

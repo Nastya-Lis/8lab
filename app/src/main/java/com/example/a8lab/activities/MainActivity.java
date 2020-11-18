@@ -14,7 +14,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +26,7 @@ import android.widget.PopupMenu;
 import android.widget.SearchView;
 
 import com.example.a8lab.R;
+import com.example.a8lab.databaseManager.RecipeSQLiteDataBase;
 import com.example.a8lab.fragments.RecipeDetailFragment;
 import com.example.a8lab.fragments.RecipeListFragment;
 import com.example.a8lab.recyclerViewPack.RecipeAdapter;
@@ -37,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,13 +50,9 @@ public class MainActivity extends AppCompatActivity {
     private RecipeDetailFragment detailFragment;
     private FragmentManager fragmentManager;
     int orientation;
-//    DatabaseReference databaseReference;
-//    String userId;
-    RecipeAdapter recipeAdapter;
-    RecyclerView recyclerView;
+
     PopupMenu popupMenu;
-    List<Recipe> recipesFromDb;
-   /* final String nameUser = "User_ID";*/
+
     Map<String,Recipe> forListManager = new HashMap<String, Recipe>() ;
 
 
@@ -62,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_page);
 
-//        userId = getDataFromPrevActivity();
 
         listFragmentLayout = findViewById(R.id.recipe_list_case);
         detailFragmentLayout = findViewById(R.id.recipe_details_case);
@@ -70,20 +69,35 @@ public class MainActivity extends AppCompatActivity {
         fragmentManager = getSupportFragmentManager();
         listFragment = new RecipeListFragment();
 
-        listFragment.takeContext(this);
+        //listFragment.takeContext(this);
        // listFragment.delDB();
 
+        AsyncModeDb task = new AsyncModeDb();
+//        task.execute();
 
         orientation = getResources().getConfiguration().orientation;
-       /* listFragment.getUserIdFromActivity(userId,orientation);*/
+
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.recipe_list_case,listFragment);
         transaction.commit();
     }
 
+  /*  @Override
+    protected void onDestroy() {
+
+        super.onDestroy();
+    }*/
+
+/*    @Override
+    protected void onPause() {
+        listFragment.closeDB();
+        super.onPause();
+    }*/
+
     @Override
     protected void onResume() {
         super.onResume();
+        //listFragment.takeContext(this);
         listFragment.createListFromDb();
         creationOfPopupMenu(orientation);
     }
@@ -100,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
             listFragment.updateFragmentData();
         }
         else if(orientation == Configuration.ORIENTATION_LANDSCAPE){
+            RecipeSQLiteDataBase recipeSQLiteDataBase = RecipeSQLiteDataBase.getInstance(this);
             detailFragmentLayout.setVisibility(View.VISIBLE);
             listFragment.setOnRecipeFragmentClickListener(recipe -> {
                 detailFragment = RecipeDetailFragment.newInstance(recipe);
@@ -241,6 +256,19 @@ public class MainActivity extends AppCompatActivity {
                 listFragment.recyclerView.setLayoutManager(new LinearLayoutManager(this));
                 reCallMethod();
                 break;
+            case R.id.sorting_by_checkFavourite:
+                listFragment.createListFromDb();
+               List<Recipe> recipeList =  listFragment.recipesFromDb.
+                        stream().
+                        filter((recipe1)-> recipe1.isFavourite() == true).
+                        collect(Collectors.toList());
+
+
+                RecipeAdapter recipeAdapterForFavourite = new RecipeAdapter(recipeList);
+                listFragment.recyclerView.setAdapter(recipeAdapterForFavourite);
+                listFragment.recyclerView.setLayoutManager(new LinearLayoutManager(this));
+                reCallMethod();
+                break;
             case R.id.up:
                 listFragment.recyclerView.scrollToPosition(0);
                 break;
@@ -249,9 +277,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     private void reCallMethod(){
         creationOfPopupMenu(orientation);
+    }
+
+
+    private class AsyncModeDb extends AsyncTask {
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            listFragment.takeContext(MainActivity.this);
+            return null;
+        }
     }
 
 }

@@ -159,8 +159,6 @@ public class AddRecipeActivity extends AppCompatActivity {
 
     public void addNewRecipe(View view) {
         createRecipe();
-        Bundle bundle = getIntent().getExtras();
-        //Context context = (Context) bundle.getSerializable("Context");
         RecipeSQLiteDataBase recipeSQLiteDataBase = RecipeSQLiteDataBase.getInstance(this);
         try {
             recipeSQLiteDataBase =  RecipeSQLiteDataBase.getInstance(this);
